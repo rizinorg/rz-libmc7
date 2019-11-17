@@ -25,7 +25,7 @@ RAsmPlugin r_asm_plugin_simatic_mc7 = {
 	.arch = "mc7",
 	.cpus = "s7-300,s7-400",
 	.bits = 32,
-	.endian = R_SYS_ENDIAN_LITTLE,
+	.endian = R_SYS_ENDIAN_BIG,
 	.disassemble = &disassemble,
 };
 
