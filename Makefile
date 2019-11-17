@@ -15,7 +15,7 @@ run_tests: $(BINS)
 
 $(BINS): %: %.o $(OBJS)
 	@echo "[LD]" $@
-	@$(CC) $(CXXFLAGS) -o $@ $< $(OBJS) $(LDFLAGS) 
+	@$(CC) $(CFLAGS) -o $@ $< $(OBJS) $(LDFLAGS) 
 
 clean:
 	rm -f *.o $(BINS) *.exe *~
