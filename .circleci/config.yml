@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: alpine:latest
+
+    steps:
+      - checkout
+      - run:
+          name: Testsuite
+          command: >
+            apk add --quiet --no-cache build-base openssl openssl-dev radare2-dev radare2 zlib-dev libzip-dev ;
+            make run_tests

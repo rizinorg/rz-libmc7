@@ -9,7 +9,7 @@ all:
 	@$(MAKE) -C r2-simatic-s7
 	@echo "built."
 
-run_test: $(BINS)
+run_tests: $(BINS)
 	@echo "built."
 	./testsuite
 
