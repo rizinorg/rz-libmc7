@@ -1,5 +1,5 @@
 OBJS     = simatic.o
-BINS     = main
+BINS     = testsuite
 
 CC       = gcc
 CFLAGS   = -g -std=c99 -Os -Wall -W -Wno-ignored-qualifiers -I$(CURDIR) -DNDEBUG -D_FORTIFY_SOURCE=1 $(shell pkg-config --cflags r_util r_io r_cons r_core)
@@ -13,5 +13,5 @@ $(BINS): %: %.o $(OBJS)
 	@$(CC) $(CXXFLAGS) -o $@ $< $(OBJS) $(LDFLAGS) 
 
 clean:
-	rm -f $(OBJS) $(BINS) *.exe *~
+	rm -f *.o $(BINS) *.exe *~
 

@@ -2331,18 +2331,19 @@ const s7_test_t tests[] = {
 
 int main() {
 	const s7_test_t* ptr = &tests[0];
-	char str[256] = {0};
+	s7_instr_t instr = {0};
 	int err = 0;
 	while (ptr && ptr->decoded) {
-		int read = simatic_s7_dec_instr (ptr->data, ptr->size, 0x80000000ull, str, sizeof (str));
+		int read = simatic_s7_dec_instr (ptr->data, ptr->size, 0x80000000ull, &instr);
 		if (read != ptr->read) {
 			printf("[XX] line %4d: size mismatch %d. expected %d (%s)\n", ptr->line, read, ptr->read, ptr->decoded);
 			err++;
-		} else if (strcmp (str, ptr->decoded)) {
-			printf("[XX] line %4d: dec  mismatch '%s'. expected '%s'\n", ptr->line, str, ptr->decoded);
+		} else if (strcmp (instr.assembly, ptr->decoded)) {
+			printf("[XX] line %4d: dec  mismatch '%s'. expected '%s'\n", ptr->line, instr.assembly, ptr->decoded);
 			err++;
 		}
 		ptr++;
 	}
+	printf("Fails %d\n", err);
 	return err;
 }
