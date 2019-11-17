@@ -10,6 +10,6 @@ jobs:
           name: Testsuite
           command: >
             apk add --quiet --no-cache build-base openssl openssl-dev radare2-dev radare2 zlib-dev libzip-dev ;
-            make run_tests 
-            r2pm init 
+            make run_tests
+            mkdir -p $(r2 -H R2_USER_PLUGINS) || sleep 0
             make all install
