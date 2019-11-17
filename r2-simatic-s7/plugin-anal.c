@@ -16,17 +16,17 @@ static int s7_anal(RAnal *anal, RAnalOp *op, ut64 addr, const ut8 *data, int len
 	op->ptr = op->val = UT64_MAX;
 
 	s7_instr_t instr = {0};
-	read = simatic_s7_dec_instr (buf, len, addr, &instr);
+	int read = simatic_s7_dec_instr (data, len, addr, &instr);
 	if (read < 0) {
 		op->size = 2;
 	} else {
 		op->size = read;
-		if (instr->jump != UT64_MAX) {
+		if (instr.jump != UT64_MAX) {
 			op->type = R_ANAL_OP_TYPE_CJMP;
-			op->jump = instr->jump;
+			op->jump = instr.jump;
 			op->fail = addr + read;
 		}
-		op->eob = instr->is_return;
+		op->eob = instr.is_return;
 	}
 	return op->size;
 }

@@ -6,12 +6,12 @@
 
 static int disassemble(RAsm *a, RAsmOp *op, const ut8 *buf, int len) {
 	s7_instr_t instr = {0};
-	read = simatic_s7_dec_instr (buf, len, a->pc, &instr);
+	int read = simatic_s7_dec_instr (buf, len, a->pc, &instr);
 	if (read < 0) {
 		r_asm_op_set_asm (op, "invalid");
 		op->size = 2;
 	} else {
-		r_asm_op_set_asm (op, instr->assembly);
+		r_asm_op_set_asm (op, instr.assembly);
 		op->size = read;
 	}
 	return op->size;
