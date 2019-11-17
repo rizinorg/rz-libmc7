@@ -5,3 +5,11 @@
 Library to disassemble MC7 bytecode for Siemens PLC SIMATIC S7-300 and S7-400
 
 
+**please report any bug. this is experimental for now**
+
+## Install
+
+```bash
+r2pm install libmc7
+```
+
