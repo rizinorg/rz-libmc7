@@ -47,7 +47,7 @@ typedef struct {
 	const char* type;
 } s7_type_t;
 
-const s7_type_t types_def[] = {
+static const s7_type_t types_def[] = {
 	{0x10, "I"}, 
 	{0x20, "Q"}, 
 	{0x30, "M"}, 
@@ -57,7 +57,7 @@ const s7_type_t types_def[] = {
 	{0xFF, NULL}
 };
 
-const s7_type_t types_x[] = {
+static const s7_type_t types_x[] = {
 	{0x10, "I"}, 
 	{0x20, "Q"}, 
 	{0x30, "M"}, 
@@ -67,7 +67,7 @@ const s7_type_t types_x[] = {
 	{0xFF, NULL}
 };
 
-const s7_type_t types_w[] = {
+static const s7_type_t types_w[] = {
 	{0x00, "PIW"}, 
 	{0x10, "IW"}, 
 	{0x20, "QW"}, 
@@ -78,7 +78,7 @@ const s7_type_t types_w[] = {
 	{0xFF, NULL}
 };
 
-const s7_type_t types_d[] = {
+static const s7_type_t types_d[] = {
 	{0x00, "PID"}, 
 	{0x10, "ID"}, 
 	{0x20, "QD"}, 
@@ -89,7 +89,7 @@ const s7_type_t types_d[] = {
 	{0xFF, NULL}
 };
 
-const s7_type_t types_b[] = {
+static const s7_type_t types_b[] = {
 	{0x00, "PIB"}, 
 	{0x10, "IB"}, 
 	{0x20, "QB"}, 
