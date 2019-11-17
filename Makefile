@@ -1,21 +1,21 @@
-TESTSUITE_OBJS     = simatic.o
-TESTSUITE_BINS     = testsuite
+OBJS     = simatic.o
+BINS     = testsuite
 
-TESTSUITE_CC       = gcc
-TESTSUITE_CFLAGS   = -g -std=c99 -Os -Wall -W -Wno-ignored-qualifiers -I$(CURDIR) -DNDEBUG -D_FORTIFY_SOURCE=1 $(shell pkg-config --cflags r_util r_io r_cons r_core)
-TESTSUITE_LDFLAGS  = $(shell pkg-config --libs r_util r_io r_cons r_core)
+CC       = gcc
+CFLAGS   = -g -std=c99 -Os -Wall -W -Wno-ignored-qualifiers -I$(CURDIR) -DNDEBUG -D_FORTIFY_SOURCE=1 $(shell pkg-config --cflags r_util r_io r_cons r_core)
+LDFLAGS  = $(shell pkg-config --libs r_util r_io r_cons r_core)
 
 all:
 	@$(MAKE) -C r2-simatic-s7
 	@echo "built."
 
-run_tests: $(TESTSUITE_BINS)
+run_tests: $(BINS)
 	@echo "built."
 	./testsuite
 
-$(TESTSUITE_BINS): %: %.o $(TESTSUITE_OBJS)
+$(BINS): %: %.o $(OBJS)
 	@echo "[LD]" $@
-	@$(TESTSUITE_CC) $(TESTSUITE_CFLAGS) -o $@ $< $(TESTSUITE_OBJS) $(TESTSUITE_LDFLAGS) 
+	@$(CC) $(CFLAGS) -o $@ $< $(OBJS) $(LDFLAGS) 
 
 clean:
 	rm -f *.o $(BINS) *.exe *~
