@@ -213,10 +213,10 @@ static int s7_decode_cmp(const char* type, const ut8* buffer, const ut64 size, s
 	(void)size;
 	switch (buffer[0]) {
 	case 0x20:
-		snprintf (instr->assembly, sizeof (instr->assembly), ">%s", type);
+		snprintf (instr->assembly, sizeof (instr->assembly), "<%s", type);
 		break;
 	case 0x40:
-		snprintf (instr->assembly, sizeof (instr->assembly), ">=%s", type);
+		snprintf (instr->assembly, sizeof (instr->assembly), "<=%s", type);
 		break;
 	case 0x60:
 		snprintf (instr->assembly, sizeof (instr->assembly), "<>%s", type);
@@ -225,10 +225,10 @@ static int s7_decode_cmp(const char* type, const ut8* buffer, const ut64 size, s
 		snprintf (instr->assembly, sizeof (instr->assembly), "==%s", type);
 		break;
 	case 0xA0:
-		snprintf (instr->assembly, sizeof (instr->assembly), "<%s", type);
+		snprintf (instr->assembly, sizeof (instr->assembly), ">%s", type);
 		break;
 	case 0xC0:
-		snprintf (instr->assembly, sizeof (instr->assembly), "<=%s", type);
+		snprintf (instr->assembly, sizeof (instr->assembly), ">=%s", type);
 		break;
 	default:
 		return -1;
@@ -304,6 +304,7 @@ static inline const char* s7_memory_loc(ut8 byte) {
 		87h | V     | Previous Local Stack
 	*/
 	switch (byte) {
+	case 0x00: return "";
 	case 0x80: return "PI/PQ";
 	case 0x81: return "I";
 	case 0x82: return "Q";
@@ -312,7 +313,9 @@ static inline const char* s7_memory_loc(ut8 byte) {
 	case 0x85: return "DI";
 	case 0x86: return "L";
 	case 0x87: return "V";
-	default: break;
+	default:
+		eprintf ("missing area 0x%02x (%u)\n", byte, byte);
+		break;
 	}
 	return NULL;
 }
@@ -338,11 +341,11 @@ static int s7_decode_lit32(const ut8* buffer, const ut64 size, s7_instr_t* instr
 	case 0x04:
 		{
 			const char* loc = s7_memory_loc (buffer[1]);
-			if (!loc || (value & 0xF80000)) {
+			if (!loc || (buffer[2] & 0xF8)) {
 				return -1;
 			}
-			ut8 bit_addr = buffer[4] & 7;
-			value = (value & 0x7FFF8) >> 3;
+			ut8 bit_addr = buffer[2] & 7;
+			value &= 0xFFFF;
 			snprintf (instr->assembly, sizeof (instr->assembly), "L P#%s%u.%u", loc, value, bit_addr);
 		}
 		break;
@@ -350,7 +353,7 @@ static int s7_decode_lit32(const ut8* buffer, const ut64 size, s7_instr_t* instr
 		snprintf (instr->assembly, sizeof (instr->assembly), "L B#(%02u, %02u, %02u, %02u)", buffer[1], buffer[2], buffer[3], buffer[4]);
 		break;
 	case 0x07:
-		snprintf (instr->assembly, sizeof (instr->assembly), "L DW#16#%u", value);
+		snprintf (instr->assembly, sizeof (instr->assembly), "L DW#16#%x", value);
 		break;
 	case 0x09:
 		snprintf (instr->assembly, sizeof (instr->assembly), "L T#%uMS", value);
@@ -1503,27 +1506,27 @@ static int s7_decode_FE(const ut8* buffer, const ut64 size, s7_instr_t* instr) {
 		case 0x03:
 			if (size > 4) {
 				ut32 value = s7_ut32 (buffer + 1);
-				snprintf (instr->assembly, sizeof (instr->assembly), "LAR1 P#%x", value);
+				snprintf (instr->assembly, sizeof (instr->assembly), "LAR1 P#%u.%u", (value >> 1), (value & 1));
 				return 6;
 			}
 			return -1;
 		case 0x0B:
 			if (size > 4) {
 				ut32 value = s7_ut32 (buffer + 1);
-				snprintf (instr->assembly, sizeof (instr->assembly), "LAR2 P#%x", value);
+				snprintf (instr->assembly, sizeof (instr->assembly), "LAR2 P#%u.%u", (value >> 1), (value & 1));
 				return 6;
 			}
 			return -1;
 		case 0x02:
 			{
 				ut16 value = s7_ut16 (buffer + 1);
-				snprintf (instr->assembly, sizeof (instr->assembly), "+AR1 P#%x", value);
+				snprintf (instr->assembly, sizeof (instr->assembly), "+AR1 P#%u.%u", (value >> 1), (value & 1));
 				return 4;
 			}
 		case 0x0A:
 			{
 				ut16 value = s7_ut16 (buffer + 1);
-				snprintf (instr->assembly, sizeof (instr->assembly), "+AR2 P#%x", value);
+				snprintf (instr->assembly, sizeof (instr->assembly), "+AR2 P#%u.%u", (value >> 1), (value & 1));
 				return 4;
 			}
 		case 0x33:
