@@ -250,9 +250,9 @@ static int s7_decode_lit16(const ut8* buffer, const ut64 size, s7_instr_t* instr
 		break;
 	case 0x05:
 		if (buffer[1]) {
-			snprintf (instr->assembly, sizeof (instr->assembly), "L '%c%c'", buffer[1], buffer[2]); // unicode hack
+			snprintf (instr->assembly, sizeof (instr->assembly), "L '%c%c'", buffer[1], buffer[2]);
 		} else {
-			snprintf (instr->assembly, sizeof (instr->assembly), "L '%c'", buffer[2]); // ascii hack
+			snprintf (instr->assembly, sizeof (instr->assembly), "L '%c'", buffer[2]);
 		}
 		break;
 	case 0x06:
@@ -347,6 +347,17 @@ static int s7_decode_lit32(const ut8* buffer, const ut64 size, s7_instr_t* instr
 			ut8 bit_addr = buffer[2] & 7;
 			value &= 0xFFFF;
 			snprintf (instr->assembly, sizeof (instr->assembly), "L P#%s%u.%u", loc, value, bit_addr);
+		}
+		break;
+	case 0x05:
+		if (buffer[1] && buffer[2] && buffer[3]) {
+			snprintf (instr->assembly, sizeof (instr->assembly), "L '%c%c%c%c'", buffer[1], buffer[2], buffer[3], buffer[4]);
+		} else if (buffer[2] && buffer[3]) {
+			snprintf (instr->assembly, sizeof (instr->assembly), "L '%c%c%c'", buffer[2], buffer[3], buffer[4]);
+		} else if (buffer[3]) {
+			snprintf (instr->assembly, sizeof (instr->assembly), "L '%c%c'", buffer[3], buffer[4]);
+		} else {
+			snprintf (instr->assembly, sizeof (instr->assembly), "L '%c'", buffer[4]);
 		}
 		break;
 	case 0x06:
@@ -1017,22 +1028,22 @@ static int s7_decode_FB(const ut8* buffer, const ut64 size, s7_instr_t* instr) {
 			snprintf (instr->assembly, sizeof (instr->assembly), "XN [AR1, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x18:
-			snprintf (instr->assembly, sizeof (instr->assembly), "A [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "A [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x19:
-			snprintf (instr->assembly, sizeof (instr->assembly), "AN [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "AN [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x1A:
-			snprintf (instr->assembly, sizeof (instr->assembly), "O [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "O [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x1B:
-			snprintf (instr->assembly, sizeof (instr->assembly), "ON [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "ON [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x1C:
-			snprintf (instr->assembly, sizeof (instr->assembly), "X [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "X [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x1D:
-			snprintf (instr->assembly, sizeof (instr->assembly), "XN [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "XN [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x20:
 			snprintf (instr->assembly, sizeof (instr->assembly), "S [AR1, P#%u.%u]", (value >> 3), (value & 7));
@@ -1050,19 +1061,19 @@ static int s7_decode_FB(const ut8* buffer, const ut64 size, s7_instr_t* instr) {
 			snprintf (instr->assembly, sizeof (instr->assembly), "FN [AR1, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x28:
-			snprintf (instr->assembly, sizeof (instr->assembly), "S [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "S [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x29:
-			snprintf (instr->assembly, sizeof (instr->assembly), "R [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "R [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x2A:
-			snprintf (instr->assembly, sizeof (instr->assembly), "= [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "= [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x2C:
-			snprintf (instr->assembly, sizeof (instr->assembly), "FP [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "FP [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x2D:
-			snprintf (instr->assembly, sizeof (instr->assembly), "FN [AR1, P#%u.%u]", (value >> 3), (value & 7));
+			snprintf (instr->assembly, sizeof (instr->assembly), "FN [AR2, P#%u.%u]", (value >> 3), (value & 7));
 			return 4;
 		case 0x30:
 			snprintf (instr->assembly, sizeof (instr->assembly), "UC FC [MW %u]", value);
@@ -1451,13 +1462,13 @@ static int s7_decode_FE(const ut8* buffer, const ut64 size, s7_instr_t* instr) {
 		case 0x02:
 			{
 				ut16 value = s7_ut16 (buffer + 1);
-				snprintf (instr->assembly, sizeof (instr->assembly), "+AR1 P#%u.%u", (value >> 1), (value & 1));
+				snprintf (instr->assembly, sizeof (instr->assembly), "+AR1 P#%u.%u", (value & 0xFFF), (value >> 12));
 				return 4;
 			}
 		case 0x0A:
 			{
 				ut16 value = s7_ut16 (buffer + 1);
-				snprintf (instr->assembly, sizeof (instr->assembly), "+AR2 P#%u.%u", (value >> 1), (value & 1));
+				snprintf (instr->assembly, sizeof (instr->assembly), "+AR2 P#%u.%u", (value & 0xFFF), (value >> 12));
 				return 4;
 			}
 		case 0x33:
@@ -2125,6 +2136,37 @@ int simatic_s7_dec_instr(const ut8* buffer, const ut64 size, const ut64 addr, s7
 			return ret;
 		}
 	case 0x68:
+		if (size > 5) {
+			ut32 value = s7_ut32 (buffer + 2);
+			switch (buffer[1]) {
+			case 0x36:
+				snprintf (instr->assembly, sizeof (instr->assembly), "AD DW#16#%x", value);
+				return 6;
+			case 0x46:
+				snprintf (instr->assembly, sizeof (instr->assembly), "OD DW#16#%x", value);
+				return 6;
+			case 0x56:
+				snprintf (instr->assembly, sizeof (instr->assembly), "XOD DW#16#%x", value);
+				return 6;
+			default:
+				break;
+			}
+		} else if (size > 3) {
+			ut16 value = s7_ut16 (buffer + 2);
+			switch (buffer[1]) {
+			case 0x34:
+				snprintf (instr->assembly, sizeof (instr->assembly), "AW W#16#%x", value);
+				return 4;
+			case 0x44:
+				snprintf (instr->assembly, sizeof (instr->assembly), "OW W#16#%x", value);
+				return 4;
+			case 0x54:
+				snprintf (instr->assembly, sizeof (instr->assembly), "XOW W#16#%x", value);
+				return 4;
+			default:
+				break;
+			}
+		}
 		if ((buffer[1] & 0x0F) == 0x01) {
 			return s7_decode_4bit ("SSI", true, buffer + 1, size - 1, instr);
 		} else {
@@ -2171,6 +2213,7 @@ int simatic_s7_dec_instr(const ut8* buffer, const ut64 size, const ut64 addr, s7
 			};
 			return s7_decode_static (ops, buffer + 1, size - 1, instr);
 		}
+		return -1;
 	case 0x69:
 		if (buffer[1] < 0x10) {
 			return s7_decode_4bit ("SRW", false, buffer + 1, size - 1, instr);
