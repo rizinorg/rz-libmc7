@@ -314,7 +314,7 @@ static inline const char* s7_memory_loc(ut8 byte) {
 	case 0x86: return "L";
 	case 0x87: return "V";
 	default:
-		eprintf ("missing area 0x%02x (%u)\n", byte, byte);
+		//eprintf ("missing area 0x%02x (%u)\n", byte, byte);
 		break;
 	}
 	return NULL;
