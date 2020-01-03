@@ -259,11 +259,11 @@ static int s7_decode_lit16(const ut8* buffer, const ut64 size, s7_instr_t* instr
 		snprintf (instr->assembly, sizeof (instr->assembly), "L B#(%02u, %02u)", buffer[1], buffer[2]);
 		break;
 	case 0x07:
-		snprintf (instr->assembly, sizeof (instr->assembly), "L W#16#%u", value);
+		snprintf (instr->assembly, sizeof (instr->assembly), "L W#16#%x", value);
 		break;
 	case 0x08:
-		if (value < 1000) {
-			snprintf (instr->assembly, sizeof (instr->assembly), "L C#%u", value);
+		if (value < 0x1000) {
+			snprintf (instr->assembly, sizeof (instr->assembly), "L C#%x", value);
 		} else {
 			return -1;
 		}
@@ -281,9 +281,15 @@ static int s7_decode_lit16(const ut8* buffer, const ut64 size, s7_instr_t* instr
 		break;
 	case 0x0C:
 		{
-			ft32 f = value;
-			f *= 6.25;
-			snprintf (instr->assembly, sizeof (instr->assembly), "L S5T#%.fMS", f);
+			st32 s = (6.25f * value) / 1000;
+			st32 ms = (value & 0xF) * 100;
+			if (ms > 900) {
+				return -1;
+			} else if (ms < 1) {
+				snprintf (instr->assembly, sizeof (instr->assembly), "L S5T#%dS", s);
+			} else {
+				snprintf (instr->assembly, sizeof (instr->assembly), "L S5T#%dS%dMS", s, ms);
+			}
 		}
 		break;
 	default:
