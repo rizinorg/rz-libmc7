@@ -213,10 +213,10 @@ static int s7_decode_cmp(const char* type, const ut8* buffer, const ut64 size, s
 	(void)size;
 	switch (buffer[0]) {
 	case 0x20:
-		snprintf (instr->assembly, sizeof (instr->assembly), "<%s", type);
+		snprintf (instr->assembly, sizeof (instr->assembly), ">%s", type);
 		break;
 	case 0x40:
-		snprintf (instr->assembly, sizeof (instr->assembly), "<=%s", type);
+		snprintf (instr->assembly, sizeof (instr->assembly), "<%s", type);
 		break;
 	case 0x60:
 		snprintf (instr->assembly, sizeof (instr->assembly), "<>%s", type);
@@ -225,10 +225,10 @@ static int s7_decode_cmp(const char* type, const ut8* buffer, const ut64 size, s
 		snprintf (instr->assembly, sizeof (instr->assembly), "==%s", type);
 		break;
 	case 0xA0:
-		snprintf (instr->assembly, sizeof (instr->assembly), ">%s", type);
+		snprintf (instr->assembly, sizeof (instr->assembly), ">=%s", type);
 		break;
 	case 0xC0:
-		snprintf (instr->assembly, sizeof (instr->assembly), ">=%s", type);
+		snprintf (instr->assembly, sizeof (instr->assembly), "<=%s", type);
 		break;
 	default:
 		return -1;
@@ -281,15 +281,63 @@ static int s7_decode_lit16(const ut8* buffer, const ut64 size, s7_instr_t* instr
 		break;
 	case 0x0C:
 		{
-			st32 s = (6.25f * value) / 1000;
-			st32 ms = (value & 0xF) * 100;
-			if (ms > 900) {
+			// S5T#0MS -> S5T#2H46M30S
+			if ((value & 0xf000) > 0x3000 || value > 0x3999) {
 				return -1;
-			} else if (ms < 1) {
-				snprintf (instr->assembly, sizeof (instr->assembly), "L S5T#%dS", s);
-			} else {
-				snprintf (instr->assembly, sizeof (instr->assembly), "L S5T#%dS%dMS", s, ms);
 			}
+			st32 ms    = 0;
+			st32 secs  = 0;
+			st32 mins  = 0;
+			st32 hours = 0;
+			/* S5TIME
+			 *  [--yy aaaa bbbb cccc]
+			 * 15                   0
+			 * yy = 00 -> 10 ms - 9 s 990 ms         (time base 10  ms)
+			 * yy = 01 -> 100 ms - 1 min 39 s 900 ms (time base 100 ms)
+			 * yy = 10 -> 1 s - 16 min 39 s          (time base 1    s)
+			 * yy = 11 -> 10 s - 2 hr 46 min 30 s    (time base 10   s)
+			 * 0000aaaabbbbcccc is time value in binary-coded decimal format
+			 */
+			ms = (((value & 0x0F00) >> 8) * 100) + (((value & 0xF0) >> 4) * 10) + (value & 0x0F);
+			if ((value & 0xf000) == 0x3000) {
+				ms *= 10000;
+			} else if ((value & 0xf000) == 0x2000) {
+				ms *= 1000;
+			} else if ((value & 0xf000) == 0x1000) {
+				ms *= 100;
+			} else {
+				ms *= 10;
+			}
+
+			if (ms >= 3600000) {
+				hours = ms / 3600000;
+				ms -= (hours * 3600000);
+			}
+
+			if (ms >= 60000) {
+				mins = ms / 60000;
+				ms -= (mins * 60000);
+			}
+
+			if (ms >= 1000) {
+				secs = ms / 1000;
+				ms -= (secs * 1000);
+			}
+
+			int p = snprintf (instr->assembly, sizeof (instr->assembly), "L S5T#");
+			if (hours > 0) {
+				p += snprintf (instr->assembly + p, sizeof (instr->assembly) - p, "%dH", hours);
+			}
+			if (mins > 0) {
+				p += snprintf (instr->assembly + p, sizeof (instr->assembly) - p, "%dM", mins);
+			}
+			if (secs > 0) {
+				p += snprintf (instr->assembly + p, sizeof (instr->assembly) - p, "%dS", secs);
+			}
+			if ((ms > 0 && ((value & 0xf000) < 0x2000)) || (hours < 1 && mins < 1 && secs < 1)) {
+				snprintf (instr->assembly + p, sizeof (instr->assembly) - p, "%dMS", ms);
+			}
+			return 4;
 		}
 		break;
 	default:
