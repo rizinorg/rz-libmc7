@@ -1,4 +1,4 @@
-# Rizin libmc7
+# Rizin MC7 disassembler 
 
 Library to disassemble MC7 bytecode for Siemens PLC SIMATIC S7-300 and S7-400
 
