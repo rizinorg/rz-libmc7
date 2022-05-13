@@ -2,3 +2,4 @@
 testsuite
 r2-simatic-s7/*.so
 r2-simatic-s7/*.o
+build*
