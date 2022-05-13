@@ -41,15 +41,16 @@ if get_option('build_shared_libs')
     install_dir: asm_plugdir
   )
 
-  libmc7_bin_src = libmc7_src + ['src' / 'plugin_bin.c']
-  libmc7_bin_deps = libmc7_deps + [rz_bin_dep]
-  shared_library('mc7_bin', libmc7_bin_src,
-    dependencies: libmc7_bin_deps,
-    include_directories: include_directories(libmc7_incs),
-    implicit_include_directories: false,
-    install: true,
-    install_dir: bin_plugdir
-  )
+  # This plugin is not in a working state, plus is difficult to find any example.
+  # libmc7_bin_src = libmc7_src + ['src' / 'plugin_bin.c']
+  # libmc7_bin_deps = libmc7_deps + [rz_bin_dep]
+  # shared_library('mc7_bin', libmc7_bin_src,
+  #   dependencies: libmc7_bin_deps,
+  #   include_directories: include_directories(libmc7_incs),
+  #   implicit_include_directories: false,
+  #   install: true,
+  #   install_dir: bin_plugdir
+  # )
 endif
 
 exe = executable('test_simatic', ['unit' / 'test_simatic.c'] + libmc7_src,
