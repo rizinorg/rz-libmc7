@@ -16,7 +16,6 @@ sudo ninja -C build install
 
 ```
 $ rizin sample.mc7.bin
- -- In radare we trust
 [0x00000000]> e asm.arch = mc7
 [0x00000000]> pdi 5 @ 0x24
 0x00000024                 600d  +D
