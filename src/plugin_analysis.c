@@ -23,8 +23,21 @@ static int s7_analysis(RzAnalysis *analysis, RzAnalysisOp *op, ut64 addr, const 
 	return op->size;
 }
 
-static int s7_archinfo(RzAnalysis *a, int q) {
-	return 2;
+static int s7_archinfo(RzAnalysis *a, RzAnalysisInfoType q) {
+	switch (q) {
+	case RZ_ANALYSIS_ARCHINFO_MIN_OP_SIZE:
+		return 2;
+	case RZ_ANALYSIS_ARCHINFO_MAX_OP_SIZE:
+		return 6;
+	case RZ_ANALYSIS_ARCHINFO_TEXT_ALIGN:
+		/* fall-thru */
+	case RZ_ANALYSIS_ARCHINFO_DATA_ALIGN:
+		return 0;
+	case RZ_ANALYSIS_ARCHINFO_CAN_USE_POINTERS:
+		return true;
+	default:
+		return -1;
+	}
 }
 
 RzAnalysisPlugin rz_analysis_plugin_mc7 = {
@@ -38,7 +51,7 @@ RzAnalysisPlugin rz_analysis_plugin_mc7 = {
 };
 
 #ifndef RZ_PLUGIN_INCORE
-RZ_API RzLibStruct radare_plugin = {
+RZ_API RzLibStruct rizin_plugin = {
 	.type = RZ_LIB_TYPE_ANALYSIS,
 	.data = &rz_analysis_plugin_mc7,
 	.version = RZ_VERSION
