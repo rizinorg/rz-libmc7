@@ -64,7 +64,8 @@ static ut32 read32(const ut8 *b) {
 	return a;
 }
 
-static bool load_buffer(RzBinFile *bf, void **bin_obj, RzBuffer *b, ut64 loadaddr, Sdb *sdb) {
+static bool load_buffer(RzBinFile *bf, RzBinObject *bin_obj, RzBuffer *b, Sdb *sdb){
+
 	ut64 size;
 	const ut8 *buf = rz_buf_data(b, &size);
 	rz_return_val_if_fail(buf && size >= sizeof(mc7_block_t), false);
@@ -86,7 +87,7 @@ static bool load_buffer(RzBinFile *bf, void **bin_obj, RzBuffer *b, ut64 loadadd
 	blk->segment_size = read16(buf + 0x1E);
 	blk->local_data_size = read16(buf + 0x20);
 	blk->data_size = read16(buf + 0x22);
-	*bin_obj = (void *)blk;
+	bin_obj->bin_obj = (void *)blk;
 	return true;
 }
 
@@ -125,17 +126,17 @@ static RzBinInfo *info(RzBinFile *arch) {
 	return ret;
 }
 
-static RzList *entries(RzBinFile *bf) {
-	RzList *ret;
+static RzPVector *entries(RzBinFile *bf) {
+	RzPVector *ret;
 	RzBinAddr *ptr = NULL;
-	if (!(ret = rz_list_new())) {
+	if (!(ret = rz_pvector_new(NULL))) {
 		return NULL;
 	}
 	if (!(ptr = RZ_NEW0(RzBinAddr))) {
 		return ret;
 	}
 	ptr->paddr = sizeof(mc7_block_t);
-	rz_list_append(ret, ptr);
+	rz_pvector_push(ret, ptr);
 	return ret;
 }
 

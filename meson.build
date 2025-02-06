@@ -7,52 +7,67 @@ project('libmc7', 'c',
     'b_vscrt=from_buildtype',
   ])
 
-libmc7_deps = []
-libmc7_src = ['src' / 'simatic.c']
-libmc7_incs = ['include']
 
+libmc7_deps = []
 if get_option('build_shared_libs')
   rizin = find_program('rizin', required: false)
-  rz_analysis_dep = dependency('rz_analysis')
-  rz_asm_dep = dependency('rz_asm')
-  rz_bin_dep = dependency('rz_bin')
+  rz_core_dep = dependency('rz_core')
+  libmc7_deps += rz_core_dep
+  libmc7_deps += dependency('rz_util')
+  libmc7_deps += dependency('rz_cons')
+  libmc7_deps += dependency('rz_config')
+  libmc7_deps += dependency('rz_io')
+  
+  rizin_plugdir = ''
+  if rizin_plugdir == ''
+    rizin_plugdir = rz_core_dep.get_variable(pkgconfig: 'plugindir', cmake: 'rz_core_PLUGINDIR')
+    plugin_libmc7_dir = join_paths(get_option('prefix'), rizin_plugdir, 'libmc7')
+  else
+    plugin_libmc7_dir = join_paths(rizin_plugdir, 'libmc7')
+  endif
+  message(' - ',plugin_libmc7_dir )
 
-  analysis_plugdir = rz_analysis_dep.get_variable(pkgconfig: 'plugindir', cmake: 'rz_analysis_PLUGINDIR')
-  asm_plugdir = rz_asm_dep.get_variable(pkgconfig: 'plugindir', cmake: 'rz_asm_PLUGINDIR')
-  bin_plugdir = rz_bin_dep.get_variable(pkgconfig: 'plugindir', cmake: 'rz_bin_PLUGINDIR')
-
-  libmc7_analysis_src = libmc7_src + ['src' / 'plugin_analysis.c']
-  libmc7_analysis_deps = libmc7_deps + [rz_analysis_dep]
-  shared_library('mc7_analysis', libmc7_analysis_src,
-    dependencies: libmc7_analysis_deps,
+  libmc7_incs = ['.', 'src','include']
+  libmc7_c_args = []
+  libmc7_asm_src = [
+    'src' / 'simatic.c',
+    'src' / 'plugin_asm.c',	
+  ]
+  shared_library('libmc7_asm', libmc7_asm_src,
+    c_args : libmc7_c_args,
+    dependencies: libmc7_deps,
     include_directories: include_directories(libmc7_incs),
     implicit_include_directories: false,
     install: true,
-    install_dir: analysis_plugdir
+    install_dir: rizin_plugdir
   )
-
-  libmc7_asm_src = libmc7_src + ['src' / 'plugin_asm.c']
-  libmc7_asm_deps = libmc7_deps + [rz_asm_dep]
-  shared_library('mc7_asm', libmc7_asm_src,
-    dependencies: libmc7_asm_deps,
+  libmc7_analysis_src = [
+    'src' / 'simatic.c',
+    'src' / 'plugin_analysis.c',	
+  ]
+  shared_library('libmc7_analysis', libmc7_analysis_src,
+    c_args : libmc7_c_args,
+    dependencies: libmc7_deps,
     include_directories: include_directories(libmc7_incs),
     implicit_include_directories: false,
     install: true,
-    install_dir: asm_plugdir
+    install_dir: rizin_plugdir
   )
-
-  # This plugin is not in a working state, plus is difficult to find any example.
-  # libmc7_bin_src = libmc7_src + ['src' / 'plugin_bin.c']
-  # libmc7_bin_deps = libmc7_deps + [rz_bin_dep]
-  # shared_library('mc7_bin', libmc7_bin_src,
-  #   dependencies: libmc7_bin_deps,
-  #   include_directories: include_directories(libmc7_incs),
-  #   implicit_include_directories: false,
-  #   install: true,
-  #   install_dir: bin_plugdir
-  # )
+  libmc7_bin_src = [
+    'src' / 'simatic.c',
+    'src' / 'plugin_bin.c',	
+  ]
+  shared_library('libmc7_bin', libmc7_bin_src,
+    c_args : libmc7_c_args,
+    dependencies: libmc7_deps,
+    include_directories: include_directories(libmc7_incs),
+    implicit_include_directories: false,
+    install: true,
+    install_dir: rizin_plugdir
+  )
 endif
 
+libmc7_src = ['src' / 'simatic.c']
 exe = executable('test_simatic', ['unit' / 'test_simatic.c'] + libmc7_src,
   c_args: [],
   include_directories: include_directories(libmc7_incs),
