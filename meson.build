@@ -9,6 +9,8 @@ project('libmc7', 'c',
 
 
 libmc7_deps = []
+libmc7_incs = ['.', 'src','include']
+
 if get_option('build_shared_libs')
   rizin = find_program('rizin', required: false)
   rz_core_dep = dependency('rz_core')
@@ -27,7 +29,7 @@ if get_option('build_shared_libs')
   endif
   message(' - ',plugin_libmc7_dir )
 
-  libmc7_incs = ['.', 'src','include']
+
   libmc7_c_args = []
   libmc7_asm_src = [
     'src' / 'simatic.c',
@@ -68,6 +70,7 @@ if get_option('build_shared_libs')
 endif
 
 libmc7_src = ['src' / 'simatic.c']
+
 exe = executable('test_simatic', ['unit' / 'test_simatic.c'] + libmc7_src,
   c_args: [],
   include_directories: include_directories(libmc7_incs),
