@@ -1,4 +1,4 @@
-Language: Cpp
+Language: C
 MaxEmptyLinesToKeep: 1
 SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: false
