@@ -27,27 +27,13 @@ if get_option('build_shared_libs')
   else
     plugin_libmc7_dir = join_paths(rizin_plugdir, 'libmc7')
   endif
-  message(' - ',plugin_libmc7_dir )
-
 
   libmc7_c_args = []
   libmc7_asm_src = [
     'src' / 'simatic.c',
-    'src' / 'plugin_asm.c',	
+    'src' / 'plugin_arch.c',
   ]
-  shared_library('libmc7_asm', libmc7_asm_src,
-    c_args : libmc7_c_args,
-    dependencies: libmc7_deps,
-    include_directories: include_directories(libmc7_incs),
-    implicit_include_directories: false,
-    install: true,
-    install_dir: rizin_plugdir
-  )
-  libmc7_analysis_src = [
-    'src' / 'simatic.c',
-    'src' / 'plugin_analysis.c',	
-  ]
-  shared_library('libmc7_analysis', libmc7_analysis_src,
+  shared_library('libmc7_arch', libmc7_asm_src,
     c_args : libmc7_c_args,
     dependencies: libmc7_deps,
     include_directories: include_directories(libmc7_incs),

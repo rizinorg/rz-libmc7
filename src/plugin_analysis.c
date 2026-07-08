@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2022 RizinOrg <info@rizin.re>
-// SPDX-FileCopyrightText: 2019-2022 deroad <wargio@libero.it>
+// SPDX-FileCopyrightText: 2022-2026 RizinOrg <info@rizin.re>
+// SPDX-FileCopyrightText: 2019-2026 deroad <deroad@kumo.xn--q9jyb4c>
 // SPDX-License-Identifier: LGPL-3.0-only
 
 #include <rz_analysis.h>
@@ -8,7 +8,7 @@
 
 #include <simatic.h>
 
-static int s7_analysis(RzAnalysis *analysis, RzAnalysisOp *op, ut64 addr, const ut8 *data, int len, RzAnalysisOpMask mask) {
+static int analysis_op_mc7(RzAnalysis *analysis, RzAnalysisOp *op, ut64 addr, const ut8 *data, int len, RzAnalysisOpMask mask) {
 	S7Instr instr = { 0 };
 	int read = simatic_s7_decode_instruction(data, len, addr, &instr);
 	if (read > 0) {
@@ -23,7 +23,7 @@ static int s7_analysis(RzAnalysis *analysis, RzAnalysisOp *op, ut64 addr, const 
 	return op->size;
 }
 
-static int s7_archinfo(RzAnalysis *a, RzAnalysisInfoType q) {
+static int archinfo_mc7(RzAnalysis *a, RzAnalysisInfoType q) {
 	switch (q) {
 	case RZ_ANALYSIS_ARCHINFO_MIN_OP_SIZE:
 		return 2;
@@ -40,20 +40,12 @@ static int s7_archinfo(RzAnalysis *a, RzAnalysisInfoType q) {
 	}
 }
 
-RzAnalysisPlugin rz_analysis_plugin_mc7 = {
+static RzAnalysisPlugin rz_analysis_plugin_mc7 = {
 	.name = "mc7",
 	.desc = "Simatic S7 analysis plugin",
 	.arch = "mc7",
 	.license = "LGPL3",
 	.bits = 32,
-	.archinfo = s7_archinfo,
-	.op = &s7_analysis,
+	.archinfo = archinfo_mc7,
+	.op = &analysis_op_mc7,
 };
-
-#ifndef RZ_PLUGIN_INCORE
-RZ_API RzLibStruct rizin_plugin = {
-	.type = RZ_LIB_TYPE_ANALYSIS,
-	.data = &rz_analysis_plugin_mc7,
-	.version = RZ_VERSION
-};
-#endif
