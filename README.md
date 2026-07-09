@@ -17,7 +17,7 @@ sudo ninja -C build install
 ```
 $ rizin sample.mc7.bin
 [0x00000000]> e asm.arch=mc7
-[0x00000000]> pdi 5 @ 0x24
+[0x00000000]> pd 5 @ 0x24
 0x00000024                 600d  +D
 0x00000026                 6009  -D
 0x00000028                 600a  *D
